@@ -35,15 +35,15 @@ class QuantumPhaseEstimator(TspSolverBase):
             qubit_1 (int): Index of qubit 1
             qubit_2 (int): Index of qubit 2    
         """
-        qc.x(q[qubit_1])
-        qc.x(q[qubit_2])
-        qc.ccx(q[qubit_1], q[qubit_2], q[k])
-        qc.x(q[k])
-        qc.x(q[qubit_1])
-        qc.x(q[qubit_2])
+        self.qc.x(q[qubit_1])
+        self.qc.x(q[qubit_2])
+        self.qc.ccx(q[qubit_1], q[qubit_2], q[k])
+        self.qc.x(q[k])
+        self.qc.x(q[qubit_1])
+        self.qc.x(q[qubit_2])
 
 
-    def are_not_equal(a_0: int, b_0: int, k: int):
+    def are_not_equal(self, a_0: int, b_0: int, k: int):
         # enter node numbers here. For example, a is node 0, b is node 1 and c 
         # is node 2
         """
@@ -57,33 +57,39 @@ class QuantumPhaseEstimator(TspSolverBase):
             k (int): 
 
         """
-        qc.cx(q[2*a_0], q[2*b_0])
-        qc.cx(q[(2*a_0) + 1], q[(2*b_0) + 1])
+        self.qc.cx(q[2*a_0], q[2*b_0])
+        self.qc.cx(q[(2*a_0) + 1], q[(2*b_0) + 1])
         OR(2*b_0, (2*b_0)+1, k)
-        qc.cx(q[2*a_0], q[2*b_0])
-        qc.cx(q[(2*a_0) + 1], q[(2*b_0) + 1])
+        self.qc.cx(q[2*a_0], q[2*b_0])
+        self.qc.cx(q[(2*a_0) + 1], q[(2*b_0) + 1])
 
-    def is_not_3(a: int, k: int):
+    def is_not_3(self, a: int, k: int):
         """Enter method docstring here"""
-        qc.ccx(q[2*a], q[(2*a)+1], q[k])
-        qc.x(q[k])
+        self.qc.ccx(q[2*a], q[(2*a)+1], q[k])
+        self.qc.x(q[k])
 
-    def initialize_oracle_part(n; int):
+    def initialize_oracle_part(self, n: int):
         """Enter method docstring here"""
         t = 4
-        are_not_equal(0, 1, 6) # node a and b are not equal 
-        are_not_equal(0, 2, 7)
-        are_not_equal(1, 2, 8)
-        is_not_3(0, 11)
-        is_not_3(1, 12)
-        is_not_3(2, 13)
-        qc.mct([q[6], q[7], q[8], q[11], q[12], q[13]], q[10],[q[9], q[14], q[15], q[16]]) # answer is stored in 10. please keep 9 a clean qubit, it's used as ancilla here 
-        is_not_3(0, 11)
-        is_not_3(1, 12)
-        is_not_3(2, 13)
-        are_not_equal(0, 1, 6) # node a and b are not equal 
-        are_not_equal(0, 2, 7)
-        are_not_equal(1, 2, 8)
+        self.are_not_equal(0, 1, 6) # node a and b are not equal 
+        self.are_not_equal(0, 2, 7)
+        self.are_not_equal(1, 2, 8)
+        self.is_not_3(0, 11)
+        self.is_not_3(1, 12)
+        self.is_not_3(2, 13)
+        self.qc.mct(
+            [q[6], q[7], q[8], q[11], q[12], q[13]],
+            q[10],
+            [q[9], q[14], q[15], q[16]]
+            )
+        # answer is stored in 10. please keep 9 a clean qubit, it's used as 
+        # ancilla here 
+        self.is_not_3(0, 11)
+        self.is_not_3(1, 12)
+        self.is_not_3(2, 13)
+        self.are_not_equal(0, 1, 6) # node a and b are not equal 
+        self.are_not_equal(0, 2, 7)
+        self.are_not_equal(1, 2, 8)
         
         ## distance_black_box, needs to become user-defined in next version
 
@@ -96,11 +102,11 @@ class QuantumPhaseEstimator(TspSolverBase):
             "10": 5,
         }
 
-        def dist_single():
+        def initialize_oracle_part(self):
             """Enter method docstring here"""
             qr = QuantumRegister(2)
             qr_target = QuantumRegister(5)
-            qc = QuantumCircuit(qr, qr_target, name='dist_single')
+            self.qc = QuantumCircuit(qr, qr_target, name='initialize_oracle_part')
 
             for edge in distances:
                 if edge[0] == '3':
@@ -109,17 +115,17 @@ class QuantumPhaseEstimator(TspSolverBase):
 
                     for idx in range(len(node)):
                         if node[idx] == '0':
-                            qc.x(qr[idx])
+                            self.qc.x(qr[idx])
 
                     for idx in range(len(d_bin)):
                         if d_bin[idx] == '1':
-                            qc.ccx(qr[0], qr[1], qr_target[idx])
+                            self.qc.ccx(qr[0], qr[1], qr_target[idx])
 
                     for idx in range(len(node)):
                         if node[idx] == '0':
-                            qc.x(qr[idx])
+                            self.qc.x(qr[idx])
 
-            return qc
+            return self.qc
 
         def dist():
             """Enter method docstring here"""
@@ -127,7 +133,7 @@ class QuantumPhaseEstimator(TspSolverBase):
             qr2 = QuantumRegister(2)
             qr_target = QuantumRegister(5)
             qr_anc = QuantumRegister(2)
-            qc = QuantumCircuit(qr1, qr2, qr_target, qr_anc, name='dist')
+            self.qc = QuantumCircuit(qr1, qr2, qr_target, qr_anc, name='dist')
 
             for edge in distances:
                 if edge[0] != '3':
@@ -138,64 +144,64 @@ class QuantumPhaseEstimator(TspSolverBase):
 
                     for idx in range(len(node1)): # assume node1 and node2 have the same length
                         if node1[idx] == '0':
-                            qc.x(qr1[idx])
+                            self.qc.x(qr1[idx])
 
                     for idx in range(len(node2)):
                         if node2[idx] == '0':
-                            qc.x(qr2[idx])
+                            self.qc.x(qr2[idx])
 
                     for idx in range(len(d_bin)):
                         if d_bin[idx] == '1':
-                            qc.mct(qr1[:]+qr2[:], qr_target[idx], qr_anc)
+                            self.qc.mct(qr1[:]+qr2[:], qr_target[idx], qr_anc)
 
                     for idx in range(len(node2)): # invert back
                         if node2[idx] == '0':
-                            qc.x(qr2[idx])
+                            self.qc.x(qr2[idx])
 
                     for idx in range(len(node1)):
                         if node1[idx] == '0':
-                            qc.x(qr1[idx])
+                            self.qc.x(qr1[idx])
 
-            return qc
+            return self.qc
         
     ## multiple adder
 
-    def maj(a, b, k):
+    def maj(self, a, b, k):
         """Enter method docstring here"""
-        qc.cx(q[k], q[b])
-        qc.cx(q[k], q[a])
-        qc.ccx(q[a], q[b], q[k])
+        self.qc.cx(q[k], q[b])
+        self.qc.cx(q[k], q[a])
+        self.qc.ccx(q[a], q[b], q[k])
 
-    def unmaj(a, b, k):
+    def unmaj(self, a, b, k):
         """Enter method docstring here"""
-        qc.ccx(q[a], q[b], q[k])
-        qc.cx(q[k], q[a])
-        qc.cx(q[a], q[b])
+        self.qc.ccx(q[a], q[b], q[k])
+        self.qc.cx(q[k], q[a])
+        self.qc.cx(q[a], q[b])
 
-    def multiple_adder(a, b, c_0, z):
+    def multiple_adder(self, a, b, c_0, z):
         """Enter method docstring here"""
         arr_size = len(a)
         maj(c_0, b[0], a[0])
         for i in range(arr_size-1):
             maj(a[i], b[i+1], a[i+1])
-        qc.cx(q[a[arr_size-1]], q[z])
+        self.qc.cx(q[a[arr_size-1]], q[z])
         for i in reversed(range(arr_size-1)):
             unmaj(a[i], b[i+1], a[i+1])
         unmaj(c_0, b[0], a[0])
     
-    ## Diffusion
+    ## self.diffusion
     
-    def diffusion():
+    def diffusion(self):
         """Enter method docstring here"""
-        qc.h(q[0:6])
-        qc.x(q[0:6])
-        qc.h(q[5])
-        qc.barrier()
-        qc.mct(q[0:5], q[5], q[7:10])
-        qc.barrier()
-        qc.h(q[5])
-        qc.x(q[0:6])
-        qc.h(q[0:6])
+        self.qc.h(q[0:6])
+        self.qc.x(q[0:6])
+        self.qc.h(q[5])
+        self.qc.barrier()
+        self.qc.mct(q[0:5], q[5], q[7:10])
+        self.qc.barrier()
+        self.qc.h(q[5])
+        self.qc.x(q[0:6])
+        self.qc.h(q[0:6])
         
     def solve_tsp(self, coordinates: np.ndarray = None) -> dict:
         """
@@ -228,57 +234,57 @@ class QuantumPhaseEstimator(TspSolverBase):
 
         q = QuantumRegister(qubit_num)
         c = ClassicalRegister(6)
-        qc = QuantumCircuit(q, c)
+        self.qc = QuantumCircuit(q, c)
 
-        qc.h(q[0:6])
-        qc.x(q[carry_check])
+        self.qc.h(q[0:6])
+        self.qc.x(q[carry_check])
 
         # forward oracle
-        initialize_oracle_part(4)
-        qc.append(dist_single(), q[inputs:inputs+2] + q[temp_dist:temp_dist+5])
+        self.initialize_oracle_part(4)
+        self.qc.append(self.initialize_oracle_part(), q[inputs:inputs+2] + q[temp_dist:temp_dist+5])
         multiple_adder([11, 12, 13, 14], [16, 17, 18, 19], init_ancillae, 20)
-        qc.append(dist_single().inverse(), q[inputs:inputs+2] + q[temp_dist:temp_dist+5])
-        qc.append(dist(), q[inputs:inputs+4] + q[temp_dist:temp_dist+5] + q[gate_ancillae:gate_ancillae+2])
+        self.qc.append(self.initialize_oracle_part().inverse(), q[inputs:inputs+2] + q[temp_dist:temp_dist+5])
+        self.qc.append(dist(), q[inputs:inputs+4] + q[temp_dist:temp_dist+5] + q[gate_ancillae:gate_ancillae+2])
         multiple_adder([11, 12, 13, 14], [16, 17, 18, 19], init_ancillae, 20)
-        qc.append(dist().inverse(), q[inputs:inputs+4] + q[temp_dist:temp_dist+5] + q[gate_ancillae:gate_ancillae+2])
-        qc.append(dist(), q[inputs+2:inputs+6] + q[temp_dist:temp_dist+5] + q[gate_ancillae:gate_ancillae+2])
+        self.qc.append(dist().inverse(), q[inputs:inputs+4] + q[temp_dist:temp_dist+5] + q[gate_ancillae:gate_ancillae+2])
+        self.qc.append(dist(), q[inputs+2:inputs+6] + q[temp_dist:temp_dist+5] + q[gate_ancillae:gate_ancillae+2])
         multiple_adder([11, 12, 13, 14], [16, 17, 18, 19], init_ancillae, 20)
-        qc.append(dist().inverse(), q[inputs+2:inputs+6] + q[temp_dist:temp_dist+5] + q[gate_ancillae:gate_ancillae+2])
-        qc.x(q[check_dist:check_dist+3]) # init 15
+        self.qc.append(dist().inverse(), q[inputs+2:inputs+6] + q[temp_dist:temp_dist+5] + q[gate_ancillae:gate_ancillae+2])
+        self.qc.x(q[check_dist:check_dist+3]) # init 15
         multiple_adder([11, 12, 13, 14, 15], [16, 17, 18, 19, 20], init_ancillae, carry_check)
 
         # carry_check
-        qc.barrier()
-        qc.cz(q[valid], q[carry_check])
-        qc.barrier()
+        self.qc.barrier()
+        self.qc.cz(q[valid], q[carry_check])
+        self.qc.barrier()
 
         # inverse oracle
         multiple_adder([11, 12, 13, 14, 15], [16, 17, 18, 19, 20], init_ancillae, carry_check)
-        qc.x(q[check_dist:check_dist+3]) # init 15
-        qc.append(dist().inverse(), q[inputs+2:inputs+6] + q[temp_dist:temp_dist+5] + q[gate_ancillae:gate_ancillae+2])
+        self.qc.x(q[check_dist:check_dist+3]) # init 15
+        self.qc.append(dist().inverse(), q[inputs+2:inputs+6] + q[temp_dist:temp_dist+5] + q[gate_ancillae:gate_ancillae+2])
         multiple_adder([11, 12, 13, 14], [16, 17, 18, 19], init_ancillae, 20)
-        qc.append(dist(), q[inputs+2:inputs+6] + q[temp_dist:temp_dist+5] + q[gate_ancillae:gate_ancillae+2])
-        qc.append(dist().inverse(), q[inputs:inputs+4] + q[temp_dist:temp_dist+5] + q[gate_ancillae:gate_ancillae+2])
+        self.qc.append(dist(), q[inputs+2:inputs+6] + q[temp_dist:temp_dist+5] + q[gate_ancillae:gate_ancillae+2])
+        self.qc.append(dist().inverse(), q[inputs:inputs+4] + q[temp_dist:temp_dist+5] + q[gate_ancillae:gate_ancillae+2])
         multiple_adder([11, 12, 13, 14], [16, 17, 18, 19], init_ancillae, 20)
-        qc.append(dist(), q[inputs:inputs+4] + q[temp_dist:temp_dist+5] + q[gate_ancillae:gate_ancillae+2])
-        qc.append(dist_single().inverse(), q[inputs:inputs+2] + q[temp_dist:temp_dist+5])
+        self.qc.append(dist(), q[inputs:inputs+4] + q[temp_dist:temp_dist+5] + q[gate_ancillae:gate_ancillae+2])
+        self.qc.append(self.initialize_oracle_part().inverse(), q[inputs:inputs+2] + q[temp_dist:temp_dist+5])
         multiple_adder([11, 12, 13, 14], [16, 17, 18, 19], init_ancillae, 20)
-        qc.append(dist_single(), q[inputs:inputs+2] + q[temp_dist:temp_dist+5])
-        initialize_oracle_part(4)
+        self.qc.append(self.initialize_oracle_part(), q[inputs:inputs+2] + q[temp_dist:temp_dist+5])
+        self.initialize_oracle_part(4)
 
-        diffusion()
+        self.self.diffusion()
 
-        qc.measure(q[:6], c)
-        qc.draw()
+        self.qc.measure(q[:6], c)
+        self.qc.draw()
         
         ## execution
         
         pass_ = Unroller(['u3', 'cx'])
         pm = PassManager(pass_)
-        new_circuit = pm.run(qc)
+        new_circuit = pm.run(self.qc)
         print(new_circuit.count_ops())
         backend = Aer.get_backend('qasm_simulator')
-        job = execute(qc, backend, shots=1024)
+        job = execute(self.qc, backend, shots=1024)
         counts = job.result().get_counts()
         
         ## show results
