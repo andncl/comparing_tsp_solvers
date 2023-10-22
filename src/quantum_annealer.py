@@ -32,6 +32,7 @@ class QuantumAnnealer(TspSolverBase):
             nr_cities (int): Number of cities to solve TSP for
         """
         self.set_cities_coordinates(nr_of_cities=nr_cities)
+
     def solve_tsp(self, coordinates):
         t0 = time.perf_counter()
         sampleset = self.sampler.sample_qubo(
@@ -42,7 +43,6 @@ class QuantumAnnealer(TspSolverBase):
         t1 = time.perf_counter()
         return t1-t0
 
-    def 
     def show_result(self):
         """Shows calculated sample set"""
         dwave.inspector.show(sampleset)
