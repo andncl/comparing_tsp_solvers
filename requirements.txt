@@ -4,3 +4,4 @@ matplotlib
 ipywidgets
 ipython
 numpy
+qiskit
