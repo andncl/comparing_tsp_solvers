@@ -1,2 +1,7 @@
 pytest
 dwave-ocean-sdk
+matplotlib
+ipywidgets
+ipython
+numpy
+qiskit
