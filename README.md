@@ -27,6 +27,6 @@ If a number does not conform to the input specs, the program prints the message 
 If there is no optimal route satisfying the threshold, the program prints the message “No optimal found”
 
 ## Grover
-After taking the input cities and distances, the program encodes all cities as quantum states and precalculates the overall distances of all routes. It then uses Grover algorithm to amplify the optimal states whose distances are below the user-defined threshold. The optimal states will appear with high probabilities in the measurement.
+After taking the input cities and distances, the program encodes all cities as quantum states and precalculates the overall distances of all routes. It then uses Grover algorithm to amplify the optimal states whose distances are below the user-defined threshold. The optimal states will appear with high probabilities in the measurement. Reference: https://github.com/Naphann/Solving-TSP-Grover.
 
 ## Adiabatic quantum computation (AQC)
