@@ -12,7 +12,7 @@ class DummySolver(TspSolverBase):
 def test_generate_cities_coordinates() -> None:
     cities = 10
     solver = DummySolver()
-    coordinates = solver.generate_cities_coordinates(nr_of_cities=cities)
+    coordinates = solver.set_cities_coordinates(nr_of_cities=cities)
     assert np.shape(coordinates) == (cities,2)
     coordinates_in_range = np.logical_and(
         coordinates.flatten() < 1,
@@ -23,7 +23,7 @@ def test_generate_cities_coordinates() -> None:
 def test_calculate_travelling_distance() -> None:
     cities = 10
     solver = DummySolver()
-    coordinates = solver.generate_cities_coordinates(nr_of_cities=cities)
+    coordinates = solver.set_cities_coordinates(nr_of_cities=cities)
     ordered_cities = solver.solve_tsp(coordinates)
     distance = solver.get_travelling_distance(ordered_cities)
     assert isinstance(distance, float)
