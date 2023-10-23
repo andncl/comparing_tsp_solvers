@@ -8,19 +8,30 @@ class TspSolverBase(ABC):
     """ TspSolverBase class formulating the TSP problem """
 
     def __init__(self):
+        """Constructor class for TspSolverBase"""
         self._cities = None
 
     @property
     def cities(self):
-        """ Cities for which we want to find the shortest path """
+        """Cities for which we want to find the shortest path"""
         return self._cities
 
     @abstractmethod
     def solve_tsp(self, coordinates):
-        pass
+        """Abstract method to be implemented on the inhereting solver classes"""
+        raise NotImplementedError
 
     def set_cities_coordinates(self, nr_of_cities: int) -> np.ndarray:
-        """Generates a set of city coordinates"""
+        """
+        Generates a set of 2D coordinates for the given number of cities.
+
+        Args:
+            nr_of_cities (int): Number of cities
+
+        Returns:
+            numpy.ndarray: Array with shape (nr_of_cities, 2), each entry has a
+                value between 0 and 1.
+        """
         coordinates = np.random.rand(nr_of_cities, 2)
         self._cities = coordinates
         return self._cities
