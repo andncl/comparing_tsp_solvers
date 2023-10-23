@@ -15,7 +15,7 @@ from qiskit.transpiler.passes import Unroller
 
 from .tsp_solver_base import TspSolverBase
 
-class QuantumPhaseEstimator(TspSolverBase):
+class Grover(TspSolverBase):
     """ 
     The SimulatedAnnealer class formulates and solves the traveling salesman
     problem with the classical simulated annealing algorithm
@@ -102,67 +102,67 @@ class QuantumPhaseEstimator(TspSolverBase):
             "10": 5,
         }
 
-        def initialize_oracle_part(self):
-            """Enter method docstring here"""
-            qr = QuantumRegister(2)
-            qr_target = QuantumRegister(5)
-            self.qc = QuantumCircuit(qr, qr_target, name='initialize_oracle_part')
+    def initialize_oracle_part(self):
+        """Enter method docstring here"""
+        qr = QuantumRegister(2)
+        qr_target = QuantumRegister(5)
+        self.qc = QuantumCircuit(qr, qr_target, name='initialize_oracle_part')
 
-            for edge in distances:
-                if edge[0] == '3':
-                    node = format(int(edge[1]), '02b')
-                    d_bin = format(distances[edge], '02b')
+        for edge in distances:
+            if edge[0] == '3':
+                node = format(int(edge[1]), '02b')
+                d_bin = format(distances[edge], '02b')
 
-                    for idx in range(len(node)):
-                        if node[idx] == '0':
-                            self.qc.x(qr[idx])
+                for idx in range(len(node)):
+                    if node[idx] == '0':
+                        self.qc.x(qr[idx])
 
-                    for idx in range(len(d_bin)):
-                        if d_bin[idx] == '1':
-                            self.qc.ccx(qr[0], qr[1], qr_target[idx])
+                for idx in range(len(d_bin)):
+                    if d_bin[idx] == '1':
+                        self.qc.ccx(qr[0], qr[1], qr_target[idx])
 
-                    for idx in range(len(node)):
-                        if node[idx] == '0':
-                            self.qc.x(qr[idx])
+                for idx in range(len(node)):
+                    if node[idx] == '0':
+                        self.qc.x(qr[idx])
 
-            return self.qc
+        return self.qc
 
-        def dist():
-            """Enter method docstring here"""
-            qr1 = QuantumRegister(2)
-            qr2 = QuantumRegister(2)
-            qr_target = QuantumRegister(5)
-            qr_anc = QuantumRegister(2)
-            self.qc = QuantumCircuit(qr1, qr2, qr_target, qr_anc, name='dist')
+    def dist():
+        """Enter method docstring here"""
+        qr1 = QuantumRegister(2)
+        qr2 = QuantumRegister(2)
+        qr_target = QuantumRegister(5)
+        qr_anc = QuantumRegister(2)
+        self.qc = QuantumCircuit(qr1, qr2, qr_target, qr_anc, name='dist')
 
-            for edge in distances:
-                if edge[0] != '3':
-                    # convert to binaries
-                    node1 = format(int(edge[0]), '02b')
-                    node2 = format(int(edge[1]), '02b')
-                    d_bin = format(distances[edge], '02b')
+        for edge in distances:
+            if edge[0] != '3':
+                # convert to binaries
+                node1 = format(int(edge[0]), '02b')
+                node2 = format(int(edge[1]), '02b')
+                d_bin = format(distances[edge], '02b')
 
-                    for idx in range(len(node1)): # assume node1 and node2 have the same length
-                        if node1[idx] == '0':
-                            self.qc.x(qr1[idx])
+                for idx in range(len(node1)): # assume node1 and node2 have the same length
+                    if node1[idx] == '0':
+                        self.qc.x(qr1[idx])
 
-                    for idx in range(len(node2)):
-                        if node2[idx] == '0':
-                            self.qc.x(qr2[idx])
+                for idx in range(len(node2)):
+                    if node2[idx] == '0':
+                        self.qc.x(qr2[idx])
 
-                    for idx in range(len(d_bin)):
-                        if d_bin[idx] == '1':
-                            self.qc.mct(qr1[:]+qr2[:], qr_target[idx], qr_anc)
+                for idx in range(len(d_bin)):
+                    if d_bin[idx] == '1':
+                        self.qc.mct(qr1[:]+qr2[:], qr_target[idx], qr_anc)
 
-                    for idx in range(len(node2)): # invert back
-                        if node2[idx] == '0':
-                            self.qc.x(qr2[idx])
+                for idx in range(len(node2)): # invert back
+                    if node2[idx] == '0':
+                        self.qc.x(qr2[idx])
 
-                    for idx in range(len(node1)):
-                        if node1[idx] == '0':
-                            self.qc.x(qr1[idx])
+                for idx in range(len(node1)):
+                    if node1[idx] == '0':
+                        self.qc.x(qr1[idx])
 
-            return self.qc
+        return self.qc
         
     ## multiple adder
 
