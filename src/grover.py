@@ -37,8 +37,8 @@ class Grover(TspSolverBase):
 
     def OR(self, qubit_1: int, qubit_2, k: int) -> None:
         """ 
-        Function does the equivalent of a classical OR between qubit numbers 
-        a and b and stores the result in qubit number k 
+        Function does the equivalent of a classical OR between qubit_1 and qubit_2,
+        and stores the result in qubit number k.
         
         Args:
             qubit_1 (int): Index of qubit 1
@@ -57,13 +57,13 @@ class Grover(TspSolverBase):
         # is node 2
         """
         Function outputs 1 if nodes a and b are not the same. Node numbering 
-        starts from 0 as in the problem statement. k is the qubit number where 
-        the output is XOR-ed. qubit numbering also starts from 0
+        starts from 0 as in the problem statement. k is the output qubit where 
+        the output is XOR-ed. qubit numbering also starts from 0.
         
         Args:
-            a_0 (int): Node number
-            b_0 (int): Node number
-            k (int): 
+            a_0 (int): node number
+            b_0 (int): node number
+            k (int): output qubit
 
         """
         self.qc.cx(self.q[2*a_0], self.q[2*b_0])
@@ -73,13 +73,27 @@ class Grover(TspSolverBase):
         self.qc.cx(self.q[(2*a_0) + 1], self.q[(2*b_0) + 1])
 
     def is_not_3(self, a: int, k: int):
-        """Enter method docstring here"""
+        """
+        Function outputs 1 if the number represented by qubits 2a and 2a+1 is not equal to 3.
+        Node numbering starts from 0 as in the problem statement. k is the qubit where 
+        the output is stored.
+        
+        Args:
+            a (int): node number
+            k (int): output qubit
+
+        """
         self.qc.ccx(self.q[2*a], self.q[(2*a)+1], self.q[k])
         self.qc.x(self.q[k])
 
-    def initialize_oracle_part(self, n: int = None):
-        """Enter method docstring here"""
-        #t = 4
+    def initialize_oracle(self, n: int = None):
+        """
+        Initial oracle to mark the validated routes
+        
+        Args:
+            None
+            
+        """
         self.are_not_equal(0, 1, 6) # node a and b are not equal 
         self.are_not_equal(0, 2, 7)
         self.are_not_equal(1, 2, 8)
@@ -91,7 +105,7 @@ class Grover(TspSolverBase):
             self.q[10],
             [self.q[9], self.q[14], self.q[15], self.q[16]]
             )
-        # answer is stored in 10. please keep 9 a clean qubit, it's used as 
+        # answer is stored in 10. keep 9 a clean qubit, it's used as 
         # ancilla here 
         self.is_not_3(0, 11)
         self.is_not_3(1, 12)
@@ -100,10 +114,16 @@ class Grover(TspSolverBase):
         self.are_not_equal(0, 2, 7)
         self.are_not_equal(1, 2, 8)
         
-        ## distance_black_box, needs to become user-defined in next version
+    ## distance_black_box, needs to become user-defined in next version
 
     def dist_single(self):
-        """Enter method docstring here"""
+        """
+        Add 4 to a distance
+        
+        Args:
+            qc: distance sum
+
+        """
         qr = QuantumRegister(2)
         qr_target = QuantumRegister(5)
         qc = QuantumCircuit(qr, qr_target, name='dist_single')
@@ -128,7 +148,13 @@ class Grover(TspSolverBase):
         return qc
 
     def dist(self):
-        """Enter method docstring here"""
+        """
+        Add 2 distances
+        
+        Args:
+            qc: distance sum
+
+        """
         qr1 = QuantumRegister(2)
         qr2 = QuantumRegister(2)
         qr_target = QuantumRegister(5)
@@ -166,19 +192,46 @@ class Grover(TspSolverBase):
 
     ## multiple adder
     def maj(self, a, b, k):
-        """Enter method docstring here"""
+        """
+        Majority function,
+        MAJ|c⟩|b⟩|a⟩ = |c⊕a⟩|b⊕a⟩|c′⟩
+        
+        Args:
+            a (int): node number
+            b (int): node number
+            k (int): output qubit
+
+        """
         self.qc.cx(self.q[k], self.q[b])
         self.qc.cx(self.q[k], self.q[a])
         self.qc.ccx(self.q[a], self.q[b], self.q[k])
 
     def unmaj(self, a, b, k):
-        """Enter method docstring here"""
+        """
+        Un-majority function,
+        UMAJ|c⟩|b⟩|a⟩ = |c⊕a⟩|b⊕a⟩|c′⟩
+        
+        Args:
+            a (int): node number
+            b (int): node number
+            k (int): output qubit
+            
+        """
         self.qc.ccx(self.q[a], self.q[b], self.q[k])
         self.qc.cx(self.q[k], self.q[a])
         self.qc.cx(self.q[a], self.q[b])
 
     def multiple_adder(self, a, b, c_0, z):
-        """Enter method docstring here"""
+        """
+        Adder
+        
+        Args:
+            a (int): node number
+            b (int): node number
+            c_0 (int): carry
+            z: sum
+            
+        """
         arr_size = len(a)
         self.maj(c_0, b[0], a[0])
         for i in range(arr_size-1):
@@ -189,7 +242,13 @@ class Grover(TspSolverBase):
         self.unmaj(c_0, b[0], a[0])
     
     def diffusion(self):
-        """Enter method docstring here"""
+        """
+        Diffusion operation for amplitude amplification
+        
+        Args:
+            None
+            
+        """
         self.qc.h(self.q[0:6])
         self.qc.x(self.q[0:6])
         self.qc.h(self.q[5])
@@ -202,7 +261,7 @@ class Grover(TspSolverBase):
         
     def solve_tsp(self, coordinates: np.ndarray = None) -> dict:
         """
-        Optimizes the travelling salesman problem with Grover's algorithm for
+        Optimises the travelling salesman problem with Grover's algorithm for
         the given coordinates.
         """
         ## build everything
@@ -242,7 +301,7 @@ class Grover(TspSolverBase):
         self.qc.x(self.q[carry_check])
 
         # forward oracle
-        self.initialize_oracle_part(4)
+        self.initialize_oracle(4)
         self.qc.append(
             self.dist_single(),
             self.q[inputs:inputs+2] + self.q[temp_dist:temp_dist+5]
@@ -310,7 +369,7 @@ class Grover(TspSolverBase):
         self.qc.append(self.dist_single().inverse(), self.q[inputs:inputs+2] + self.q[temp_dist:temp_dist+5])
         self.multiple_adder([11, 12, 13, 14], [16, 17, 18, 19], init_ancillae, 20)
         self.qc.append(self.dist_single(), self.q[inputs:inputs+2] + self.q[temp_dist:temp_dist+5])
-        self.initialize_oracle_part(4)
+        self.initialize_oracle(4)
 
         self.diffusion()
 
