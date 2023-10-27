@@ -26,4 +26,5 @@ class BruteForceSolver(TspSolverBase):
         Args:
             coordinates (numpy.ndarray): Coordinates of the given cities
         """
+        for 
         self.current_distance()
