@@ -37,8 +37,8 @@ class Grover(TspSolverBase):
 
     def OR(self, qubit_1: int, qubit_2, k: int) -> None:
         """ 
-        Function does the equivalent of a classical OR between qubit_1 and qubit_2,
-        and stores the result in qubit number k.
+        Function does the equivalent of a classical OR between qubit_1 and
+        qubit_2, sand stores the result in qubit number k.
         
         Args:
             qubit_1 (int): Index of qubit 1
@@ -74,9 +74,9 @@ class Grover(TspSolverBase):
 
     def is_not_3(self, a: int, k: int):
         """
-        Function outputs 1 if the number represented by qubits 2a and 2a+1 is not equal to 3.
-        Node numbering starts from 0 as in the problem statement. k is the qubit where 
-        the output is stored.
+        Function outputs 1 if the number represented by qubits 2a and 2a+1 is 
+        not equal to 3. Node numbering starts from 0 as in the problem 
+        statement. k is the qubit where the output is stored.
         
         Args:
             a (int): node number
@@ -122,7 +122,8 @@ class Grover(TspSolverBase):
         
         Args:
             qc: distance sum
-
+        Returns:
+            QuantumCircuit
         """
         qr = QuantumRegister(2)
         qr_target = QuantumRegister(5)
@@ -258,22 +259,49 @@ class Grover(TspSolverBase):
         self.qc.h(self.q[5])
         self.qc.x(self.q[0:6])
         self.qc.h(self.q[0:6])
+
+    def calculate_distances(self, cities: dict):
+        """
+        Calculates a dictionairy with city index combinations as keys and their
+        distances as value
         
-    def solve_tsp(self, coordinates: np.ndarray = None) -> dict:
+        Args:
+            cities (dict): Dictionairy with cities and their coordinates
+
+        Returns:
+            dict: Dict giving inter city distances
+        """
+        distances = {}
+        for first_city_idx in list(cities.keys()):
+            if first_city_idx < 1:
+                continue
+            for sec_city_idx in range(first_city_idx):
+                if sec_city_idx > first_city_idx:
+                    continue
+                distances[
+                    str(first_city_idx)+str(sec_city_idx)
+                    ] = self.calc_inter_city_distance(
+                        first_city_idx, sec_city_idx)
+        return distances
+    
+    def solve_tsp(self, cities: dict) -> dict:
         """
         Optimises the travelling salesman problem with Grover's algorithm for
         the given coordinates.
         """
         ## build everything
         qubit_num = 25  # max is 32 if you're using the simulator
-        self.distances = {
-            "32": 3,
-            "31": 2,
-            "30": 4,
-            "21": 7,
-            "20": 6,
-            "10": 5,
-        }
+        if len(cities) is not 4:
+            raise ValueError("This algorithm supports 4 cities!")
+        self.distances = self.calculate_distances(cities)
+        # self.distances = {
+        #     "32": 3,
+        #     "31": 2,
+        #     "30": 4,
+        #     "21": 7,
+        #     "20": 6,
+        #     "10": 5,
+        # }
         # ancilla indices
         inputs = [0, 1, 2, 3, 4, 5]
         init_ancillae = [6, 7, 8, 9]
@@ -358,19 +386,60 @@ class Grover(TspSolverBase):
         self.qc.barrier()
 
         # inverse oracle
-        self.multiple_adder([11, 12, 13, 14, 15], [16, 17, 18, 19, 20], init_ancillae, carry_check)
+        self.multiple_adder(
+            [11, 12, 13, 14, 15],
+            [16, 17, 18, 19, 20],
+            init_ancillae,
+            carry_check
+            )
         self.qc.x(self.q[check_dist:check_dist+3]) # init 15
-        self.qc.append(self.dist().inverse(), self.q[inputs+2:inputs+6] + self.q[temp_dist:temp_dist+5] + self.q[gate_ancillae:gate_ancillae+2])
-        self.multiple_adder([11, 12, 13, 14], [16, 17, 18, 19], init_ancillae, 20)
-        self.qc.append(self.dist(), self.q[inputs+2:inputs+6] + self.q[temp_dist:temp_dist+5] + self.q[gate_ancillae:gate_ancillae+2])
-        self.qc.append(self.dist().inverse(), self.q[inputs:inputs+4] + self.q[temp_dist:temp_dist+5] + self.q[gate_ancillae:gate_ancillae+2])
-        self.multiple_adder([11, 12, 13, 14], [16, 17, 18, 19], init_ancillae, 20)
-        self.qc.append(self.dist(), self.q[inputs:inputs+4] + self.q[temp_dist:temp_dist+5] + self.q[gate_ancillae:gate_ancillae+2])
-        self.qc.append(self.dist_single().inverse(), self.q[inputs:inputs+2] + self.q[temp_dist:temp_dist+5])
-        self.multiple_adder([11, 12, 13, 14], [16, 17, 18, 19], init_ancillae, 20)
-        self.qc.append(self.dist_single(), self.q[inputs:inputs+2] + self.q[temp_dist:temp_dist+5])
+        self.qc.append(
+            self.dist().inverse(),
+            self.q[inputs+2:inputs+6] + self.q[temp_dist:temp_dist+5] +
+            self.q[gate_ancillae:gate_ancillae+2]
+            )
+        self.multiple_adder(
+            [11, 12, 13, 14],
+            [16, 17, 18, 19],
+            init_ancillae,
+            20
+            )
+        self.qc.append(
+            self.dist(),
+            self.q[inputs+2:inputs+6] + self.q[temp_dist:temp_dist+5] +
+            self.q[gate_ancillae:gate_ancillae+2]
+            )
+        self.qc.append(
+            self.dist().inverse(),
+            self.q[inputs:inputs+4] + self.q[temp_dist:temp_dist+5] +
+            self.q[gate_ancillae:gate_ancillae+2]
+            )
+        self.multiple_adder(
+            [11, 12, 13, 14],
+            [16, 17, 18, 19],
+            init_ancillae,
+            20
+            )
+        self.qc.append(
+            self.dist(),
+            self.q[inputs:inputs+4] + self.q[temp_dist:temp_dist+5] +
+            self.q[gate_ancillae:gate_ancillae+2]
+            )
+        self.qc.append(
+            self.dist_single().inverse(),
+            self.q[inputs:inputs+2] + self.q[temp_dist:temp_dist+5]
+            )
+        self.multiple_adder(
+            [11, 12, 13, 14],
+            [16, 17, 18, 19],
+            init_ancillae,
+            20
+            )
+        self.qc.append(
+            self.dist_single(),
+            self.q[inputs:inputs+2] + self.q[temp_dist:temp_dist+5]
+            )
         self.initialize_oracle(4)
-
         self.diffusion()
 
         self.qc.measure(self.q[:6], self.c)
@@ -387,6 +456,31 @@ class Grover(TspSolverBase):
         counts = job.result().get_counts()
         
         ## show results
-        
-        print(f"RESULT: {sorted(counts.items(), key=lambda x:x[1], reverse=True)[0:20]}")
+        sorted_states_bin = sorted(
+            counts.items(), key=lambda x:x[1], reverse=True)[0:20]
+        sorted_states_dec = []
+        for state in sorted_states_bin:
+            decimal_result = self.convert_binary_to_decimal_result(state[0])
+            sorted_states_dec.append((
+                    decimal_result,
+                    state[1],
+                    self.calc_travel_dist(decimal_result)
+                    )
+            )
+        print(f"RESULT_bin: {sorted_states_bin}")
+        print(f"RESULT_dec: {sorted_states_dec}")
         plot_histogram(counts)
+        return sorted_states_dec[0][0]
+
+    def convert_binary_to_decimal_result(self, bin_result):
+        """
+        Converts the given binary result to a decimal result
+
+        Args:
+            bin_result (str): Binary sequence encoding the given order
+
+        Returns:
+            str: Decimal sequence of cities
+        """
+        dec=  [int(bin_result[i:i+2], 2) for i in range(0, len(bin_result), 2)]
+        return '0'+''.join(str(x+1) for x in dec)
