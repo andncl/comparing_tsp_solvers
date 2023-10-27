@@ -1,4 +1,4 @@
-"""Module containing QuantumPhaseEstimator class"""
+"""Module containing G class"""
 import copy
 import logging
 import typing_extensions
