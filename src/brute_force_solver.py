@@ -1,6 +1,7 @@
 """Module containing SimulatedAnnealer class"""
 import copy
 import logging
+import itertools
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -26,5 +27,9 @@ class BruteForceSolver(TspSolverBase):
         Args:
             coordinates (numpy.ndarray): Coordinates of the given cities
         """
-        for 
-        self.current_distance()
+        index_list = list(self.cities.keys())
+        permutations = list(itertools.permutations(index_list[1:]))
+        all_seq = ['0'+''.join(perm) for perm in permutations]
+        all_paths={seq: self.get_total_travel_distance(seq) for seq in all_seq}
+        sorted_paths=dict(sorted(all_paths.items(), key=lambda item: item[1]))
+        return list(sorted_paths.keys())[0]
