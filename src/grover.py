@@ -260,49 +260,27 @@ class Grover(TspSolverBase):
         self.qc.x(self.q[0:6])
         self.qc.h(self.q[0:6])
 
-    def calculate_distances(self, cities: dict):
-        """
-        Calculates a dictionairy with city index combinations as keys and their
-        distances as value
-        
-        Args:
-            cities (dict): Dictionairy with cities and their coordinates
 
-        Returns:
-            dict: Dict giving inter city distances
-        """
-        distances = {}
-        for first_city_idx in list(cities.keys()):
-            if first_city_idx < 1:
-                continue
-            for sec_city_idx in range(first_city_idx):
-                if sec_city_idx > first_city_idx:
-                    continue
-                distances[
-                    str(first_city_idx)+str(sec_city_idx)
-                    ] = self.calc_inter_city_distance(
-                        first_city_idx, sec_city_idx)
-        return distances
     
-    def solve_tsp(self, cities: dict) -> dict:
+    def solve_tsp(self, cities: dict, verbose: bool = False) -> dict:
         """
         Optimises the travelling salesman problem with Grover's algorithm for
         the given coordinates.
+
+        Args:
+            cities (dict): cities to solve the TSP for
+            verbose (bool): Whether the 20 best states are printed after solving
+
+        Returns:
+            str: String of cities that represent the solved sequence
+
+        Raises:
+            ValueError: If the given dict of cities is not eual to 4
         """
-        ## build everything
         qubit_num = 25  # max is 32 if you're using the simulator
         if len(cities) is not 4:
             raise ValueError("This algorithm supports 4 cities!")
         self.distances = self.calculate_distances(cities)
-        # self.distances = {
-        #     "32": 3,
-        #     "31": 2,
-        #     "30": 4,
-        #     "21": 7,
-        #     "20": 6,
-        #     "10": 5,
-        # }
-        # ancilla indices
         inputs = [0, 1, 2, 3, 4, 5]
         init_ancillae = [6, 7, 8, 9]
         valid = [10]
@@ -450,7 +428,7 @@ class Grover(TspSolverBase):
         pass_ = Unroller(['u3', 'cx'])
         pm = PassManager(pass_)
         new_circuit = pm.run(self.qc)
-        print(f"New circuit: {new_circuit.count_ops()}")
+        #print(f"New circuit: {new_circuit.count_ops()}")
         backend = Aer.get_backend('qasm_simulator')
         job = execute(self.qc, backend, shots=1024)
         counts = job.result().get_counts()
@@ -464,11 +442,12 @@ class Grover(TspSolverBase):
             sorted_states_dec.append((
                     decimal_result,
                     state[1],
-                    self.calc_travel_dist(decimal_result)
+                    self.get_total_travel_distance(str(decimal_result))
                     )
             )
-        print(f"RESULT_bin: {sorted_states_bin}")
-        print(f"RESULT_dec: {sorted_states_dec}")
+        if verbose:
+            print(f"RESULT_bin: {sorted_states_bin}")
+            print(f"RESULT_dec: {sorted_states_dec}")
         plot_histogram(counts)
         return sorted_states_dec[0][0]
 
