@@ -10,7 +10,7 @@ from dwave.embedding.chain_strength import scaled
 from dwave.system.composites import EmbeddingComposite
 from dwave.system.samplers import DWaveSampler
 import dwave.inspector
-
+   
 
 from .tsp_solver_base import TspSolverBase
 
