@@ -4,5 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tsp_solver"
-requires-python = ">=3.11"
+requires-python = ">=3.10, <3.12"
 version = "0.1.0"
+dependencies = [
+    'numpy',
+    'matplotlib',
+    'qiskit',
+    'ipython',
+    'ipywidgets',
+    'pytest',
+]
