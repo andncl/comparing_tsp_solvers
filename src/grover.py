@@ -53,8 +53,6 @@ class Grover(TspSolverBase):
 
 
     def are_not_equal(self, a_0: int, b_0: int, k: int):
-        # enter node numbers here. For example, a is node 0, b is node 1 and c 
-        # is node 2
         """
         Function outputs 1 if nodes a and b are not the same. Node numbering 
         starts from 0 as in the problem statement. k is the output qubit where 
@@ -123,7 +121,7 @@ class Grover(TspSolverBase):
         Args:
             qc: distance sum
         Returns:
-            QuantumCircuit
+            qiskit.QuantumCircuit: Circuit for dist_single oracle
         """
         qr = QuantumRegister(2)
         qr_target = QuantumRegister(5)
@@ -150,11 +148,13 @@ class Grover(TspSolverBase):
 
     def dist(self):
         """
-        Add 2 distances
+        Adds 2 distances
         
         Args:
             qc: distance sum
 
+        Returns:
+            qiskit.QuantumCircuit: Circuit for dist oracle
         """
         qr1 = QuantumRegister(2)
         qr2 = QuantumRegister(2)
@@ -168,8 +168,8 @@ class Grover(TspSolverBase):
                 node1 = format(int(edge[0]), '02b')
                 node2 = format(int(edge[1]), '02b')
                 d_bin = format(self.distances[edge], '02b')
-
-                for idx in range(len(node1)): # assume node1 and node2 have the same length
+                # assume node1 and node2 have the same length
+                for idx in range(len(node1)): 
                     if node1[idx] == '0':
                         qc.x(qr1[idx])
 
@@ -188,7 +188,6 @@ class Grover(TspSolverBase):
                 for idx in range(len(node1)):
                     if node1[idx] == '0':
                         qc.x(qr1[idx])
-
         return qc
 
     ## multiple adder

@@ -10,6 +10,7 @@ class TspSolverBase(ABC):
     def __init__(self):
         """Constructor class for TspSolverBase"""
         self._cities = None
+        self.grid_size = None
 
     @property
     def cities(self) -> dict:
@@ -19,6 +20,7 @@ class TspSolverBase(ABC):
     @cities.setter
     def cities(self, city_dict):
         keys = [int(i) for i in city_dict.keys()]
+
         if not set(keys).issubset(list(range(len(city_dict)))):
             raise ValueError(
                 "Each index from 0 to nr_of_cities in city dict must occur"
@@ -138,7 +140,7 @@ class TspSolverBase(ABC):
 
     def plot_cities_on_grid(self):
         """Plots the set cities on a map"""
-        fig, ax = plt.subplots(figsize = (4,4))
+        fig, ax = plt.subplots(figsize = (5,5))
         coords = np.array(list(self.cities.values()))
         ax.set_xlim((0,self.grid_size))
         ax.set_ylim((0,self.grid_size))
@@ -154,12 +156,3 @@ class TspSolverBase(ABC):
         coords.append(self.cities['0'])
         coords = np.array(coords)
         axs.plot(coords[:,0], coords[:,1])
-
-    def plot_result(self, ordered_cities) -> plt.figure:
-        """Plots the given path between cities"""
-        coords = self.get_path_plot_coords(ordered_cities)
-        fig, ax = plt.subplots()
-        ax.plot(coords[:,0], coords[:,1])
-        ax.scatter(coords[:,0], coords[:,1], color = 'red')
-
-        return fig, ax
