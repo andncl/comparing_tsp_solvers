@@ -4,24 +4,23 @@ import numpy as np
 from src.tsp_solver_base import TspSolverBase
 
 class DummySolver(TspSolverBase):
-
     def solve_tsp(self, coordinates):
         solution = {i: city for i, city in enumerate(coordinates)}
         return solution
 
-def test_generate_cities_coordinates() -> None:
-    cities = 10
+@pytest.mark.parametrize([3,4,6,9,12,99], [8,4,12,59,7,99])
+def test_set_cities_coordinates(nr_cities, size) -> None:
     solver = DummySolver()
-    coordinates = solver.set_cities_coordinates(nr_of_cities=cities)
-    assert np.shape(coordinates) == (cities,2)
-    coordinates_in_range = np.logical_and(
-        coordinates.flatten() < 1,
-        coordinates.flatten() >= 0
-    )
-    assert all(coordinates_in_range)
+    cities = solver.set_cities_coordinates(nr_cities, grid_size = size)
+    assert isinstance(cities, dict)
+    assert all(len(coord) for coord in cities.values())
+    assert set(range(len(cities))).issubset(list(cities.keys()))
 
-def test_calculate_travelling_distance() -> None:
-    cities = 10
+    for coords in cities.values():
+        assert all(coord < size for coord in coords)
+
+def test_get_total_travel_distance(dummy_solver) -> None:
+    cities = 4
     solver = DummySolver()
     coordinates = solver.set_cities_coordinates(nr_of_cities=cities)
     ordered_cities = solver.solve_tsp(coordinates)
