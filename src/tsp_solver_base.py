@@ -105,6 +105,8 @@ class TspSolverBase(ABC):
             ValueError: if city index is missing from sequence, if index is 
                 double, if 
         """
+        if len(sequence) != len(self.cities):
+            return False
         if not isinstance(sequence, str):
             raise ValueError(f"sequence must be str but is {type(sequence)}")
         given_indices = list(self.cities.keys())
