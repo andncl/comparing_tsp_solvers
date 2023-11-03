@@ -278,7 +278,7 @@ class Grover(TspSolverBase):
         """
         qubit_num = 25  # max is 32 if you're using the simulator
         if len(cities) is not 4:
-            raise ValueError("This algorithm supports 4 cities!")
+            raise ValueError("This algorithm supports 4 only cities!")
         self.distances = self.calculate_distances(cities)
         inputs = [0, 1, 2, 3, 4, 5]
         init_ancillae = [6, 7, 8, 9]

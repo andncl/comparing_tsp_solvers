@@ -1,9 +1,13 @@
 # comparing_tsp_solvers
 Universal platform to quantify different traveling salesman
-problem (TSP) solvers. Two different approaches are demonstrated her. Namely a brute force algorim and the quantum Grover algorithm
+problem (TSP) solvers. Two different approaches are demonstrated her. 
+Namely a brute force algorim and the quantum Grover algorithm. A demo of both of
+which can be found in `demo.ipynb`.
+
 
 ## Traveling Salesman Problem
-The traveling salesman is the seemingly simple task to find a minimum route to connect a number of N cities on a map, such that the total distance to pass to
+The traveling salesman is the seemingly simple task to find a minimum route to 
+connect a number of N cities on a map, such that the total distance to pass to
 visit all cities is minimal. One can find (N-1)! possible paths for a round 
 tour through all available stops. This is feasible for a hand full of cities
 e.g for 5  we find 4!=24  paths. However only doubling the cities to 8 already 
